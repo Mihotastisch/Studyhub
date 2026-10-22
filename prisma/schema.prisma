@@ -1,0 +1,102 @@
+generator client {
+ provider = "prisma-client-js"
+}
+datasource db {
+ provider = "sqlite"
+ url = env("DATABASE_URL")
+}
+model SyncSource {
+ id String @id
+ name String
+ kind String
+ rawIcs String?
+ lastSyncedAt DateTime?
+ subscriptionUrlEncrypted String?
+ subscriptionUrlHash String? @unique
+ subscriptionFrom DateTime?
+ subscriptionTo DateTime?
+ courses Course[]
+ events CalendarEvent[]
+ tasks Task[]
+ exams Exam[]
+ materials LearningMaterial[]
+ notifications Notification[]
+}
+model Course {
+ id String @id @default(cuid())
+ title String
+ code String
+ color String @default("#0f766e")
+ sourceId String
+ source SyncSource @relation(fields: [sourceId], references: [id])
+ events CalendarEvent[]
+ tasks Task[]
+ exams Exam[]
+ materials LearningMaterial[]
+}
+model CalendarEvent {
+ id String @id @default(cuid())
+ externalId String
+ title String
+ description String @default("")
+ location String @default("")
+ start DateTime
+ end DateTime
+ allDay Boolean @default(false)
+ missingFromFeed Boolean @default(false)
+ courseId String?
+ course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+ sourceId String
+ source SyncSource @relation(fields: [sourceId], references: [id])
+ @@unique([sourceId, externalId])
+ @@index([start])
+}
+model Task {
+ id String @id @default(cuid())
+ externalId String @default(cuid())
+ title String
+ description String @default("")
+ dueAt DateTime
+ done Boolean @default(false)
+ reminderMinutes Int?
+ courseId String?
+ course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+ sourceId String
+ source SyncSource @relation(fields: [sourceId], references: [id])
+ @@unique([sourceId, externalId])
+}
+model Exam {
+ id String @id @default(cuid())
+ externalId String @default(cuid())
+ title String
+ description String @default("")
+ dueAt DateTime
+ reminderMinutes Int?
+ courseId String?
+ course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+ sourceId String
+ source SyncSource @relation(fields: [sourceId], references: [id])
+ @@unique([sourceId, externalId])
+}
+model LearningMaterial {
+ id String @id @default(cuid())
+ externalId String
+ title String
+ url String?
+ createdAt DateTime @default(now())
+ courseId String?
+ course Course? @relation(fields: [courseId], references: [id], onDelete: SetNull)
+ sourceId String
+ source SyncSource @relation(fields: [sourceId], references: [id])
+ @@unique([sourceId, externalId])
+}
+model Notification {
+ id String @id @default(cuid())
+ externalId String
+ title String
+ dueAt DateTime
+ read Boolean @default(false)
+ sourceId String
+ source SyncSource @relation(fields: [sourceId], references: [id])
+ @@unique([sourceId, externalId])
+}

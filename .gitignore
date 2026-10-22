@@ -1,0 +1,40 @@
+node_modules/
+.next/
+out/
+coverage/
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.tsbuildinfo
+Microsoft/
+
+# Local databases, exports, backups and build output
+*.sqlite
+*.sqlite3
+*.sqlite-*
+*.sqlite3-*
+*.db.*
+*.bak
+*.backup
+dist/
+build/
+.turbo/
+*.log
+
+# Personal calendar exports; only the explicitly synthetic example is public
+*.ics
+!examples/demo.ics
+
+# Local secrets and private key material
+.envrc
+.secrets/
+secrets/
+.aws/
+*.pem
+*.key
+*.p12
+*.pfx
